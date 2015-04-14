@@ -17,8 +17,8 @@ public class OcsUtil {
             return Optional.ofNullable(call.apply());
         } catch (Exception e) {
             log.warning(() -> String.format("swallowed: %s%n%s", e, Arrays.stream(e.getStackTrace())
-                .map((ele) -> String.format("%s:%d; ", ele.getFileName(), ele.getLineNumber()))
-                .reduce(String::concat).orElse("?")
+                    .map((ele) -> String.format("%s:%d; ", ele.getFileName(), ele.getLineNumber()))
+                    .reduce(String::concat).orElse("?")
             ));
             return Optional.empty();
         }
@@ -29,9 +29,25 @@ public class OcsUtil {
             call.apply();
         } catch (Throwable e) {
             log.warning(() -> String.format("swallowed: %s (Cause: %s)%n%s", e, e.getCause(), Arrays.stream(e.getStackTrace())
-                .map((ele) -> String.format("%s:%d; ", ele.getFileName(), ele.getLineNumber()))
-                .reduce(String::concat).orElse("?")
+                    .map((ele) -> String.format("%s:%d; ", ele.getFileName(), ele.getLineNumber()))
+                    .reduce(String::concat).orElse("?")
             ));
+        }
+    }
+
+    public static void runtime(FunctionThatThrows call) {
+        try {
+            call.apply();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T runtime(FunctionThatThrowsReturns<T> call) {
+        try {
+            return call.apply();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -46,28 +62,35 @@ public class OcsUtil {
 
     @FunctionalInterface
     public static interface FunctionThatThrows {
+
         public void apply() throws Exception;
     }
 
     @FunctionalInterface
     public static interface FunctionThatThrowsReturns<R> {
+
         public R apply() throws Exception;
     }
 
     @FunctionalInterface
     public static interface Closeable<T> extends AutoCloseable {
+
         default public T get() {
             throw new RuntimeException("not implemented");
         }
+
         @Override
         public void close();
     }
 
     public static abstract class CloseableImpl<T> implements Closeable<T> {
+
         final private T t;
+
         public CloseableImpl(T t) {
             this.t = t;
         }
+
         @Override
         public T get() {
             return t;
