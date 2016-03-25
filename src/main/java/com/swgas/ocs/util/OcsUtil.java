@@ -8,17 +8,18 @@ import java.util.stream.Collectors;
 
 public class OcsUtil {
 
-    private static final Logger log = Logger.getLogger(OcsUtil.class.getName());
+    private static final Logger LOG = Logger.getLogger(OcsUtil.class.getName());
     public static final String ALL_ERRORS_ON_PAGE_CSS = "css=.alert-danger";
-    public static final String WEBTRANID_ID = "tranid";
+    public static final String WEBTRANID_ID           = "tranid";
+    public static final String ERROR_MESSAGE_ID       = "errorMessage";
 
     public static <R> Optional<R> swallow(FunctionThatThrowsReturns<R> call) {
         try {
             return Optional.ofNullable(call.apply());
         } catch (Exception e) {
-            log.warning(() -> String.format("swallowed: %s%n%s", e, Arrays.stream(e.getStackTrace())
-                    .map((ele) -> String.format("%s:%d; ", ele.getFileName(), ele.getLineNumber()))
-                    .reduce(String::concat).orElse("?")
+            LOG.warning(() -> String.format("swallowed: %s%n%s", e, Arrays.stream(e.getStackTrace())
+                .map((ele) -> String.format("%s:%d; ", ele.getFileName(), ele.getLineNumber()))
+                .reduce(String::concat).orElse("?")
             ));
             return Optional.empty();
         }
@@ -28,7 +29,7 @@ public class OcsUtil {
         try {
             call.apply();
         } catch (Throwable e) {
-            log.warning(() -> String.format("swallowed: %s (Cause: %s)%n%s", e, e.getCause(), Arrays.stream(e.getStackTrace())
+            LOG.warning(() -> String.format("swallowed: %s (Cause: %s)%n%s", e, e.getCause(), Arrays.stream(e.getStackTrace())
                     .map((ele) -> String.format("%s:%d; ", ele.getFileName(), ele.getLineNumber()))
                     .reduce(String::concat).orElse("?")
             ));
