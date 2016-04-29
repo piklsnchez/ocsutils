@@ -37,37 +37,6 @@ public class OcsUtil {
         }
         return sb.toString().substring(0, sb.lastIndexOf(","));
     }
-
-    public static String camelCase(String s){
-        if(!s.contains("_")){
-            return s;
-        }
-        boolean hump = true;
-        StringBuilder sb = new StringBuilder();
-        for(char c : s.toCharArray()){
-            if('_' == c){
-                hump = true;
-            } else {
-                sb.append((hump ? Character.toUpperCase(c) : Character.toLowerCase(c)));
-                hump = false;
-            }
-        }
-        return sb.toString();
-    }
-
-    public static String unCamelCase(String s){
-        if(s.contains("_")){
-            return s;
-        }
-        StringBuilder sb = new StringBuilder();
-        for(char c : s.toCharArray()){
-            sb.append((Character.isUpperCase(c) || Character.isDigit(c) ? ("_" + c) : c));
-        }
-        if(sb.charAt(0) == '_'){
-            sb.replace(0, 1, "");
-        }
-        return sb.toString().toUpperCase();
-    }
     
     public static <R> Optional<R> swallow(FunctionThatThrowsReturns<R> call) {
         try {
