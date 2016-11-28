@@ -51,7 +51,10 @@ public class Remove {
 
     public static boolean removeDirectory(String target) {
         Path destination = Paths.get(Objects.requireNonNull(target));
-        if (!destination.toFile().getParentFile().isDirectory()) {
+        if(!destination.toFile().exists()){
+            return false;
+        }
+        if (!destination.toFile().isDirectory()) {
             throw new IllegalArgumentException(String.format("must be a directory", target));
         }
         // check if target is a directory
