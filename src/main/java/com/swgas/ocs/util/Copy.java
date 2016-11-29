@@ -69,7 +69,7 @@ public class Copy {
         Path source = Paths.get(Objects.requireNonNull(src));
         Path destination = Paths.get(Objects.requireNonNull(target));
         if (!source.toFile().isDirectory() || !destination.toFile().getParentFile().isDirectory()) {
-            throw new IllegalArgumentException(String.format("%s and %s must be directories", src, target));
+            throw new IllegalArgumentException(String.format("%s and %s must be directories", src, destination.toFile().getParentFile().getAbsolutePath()));
         }
         // check if target is a directory
         EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
