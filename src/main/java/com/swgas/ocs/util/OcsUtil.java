@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class OcsUtil {
@@ -12,32 +11,7 @@ public class OcsUtil {
     public static final String ALL_ERRORS_ON_PAGE_CSS = "css=.alert-danger";
     public static final String WEBTRANID_ID           = "tranid";
     public static final String ERROR_MESSAGE_ID       = "errorMessage";
-    
-    public static String csv(String[] s){
-        StringBuilder sb = new StringBuilder();
-        for(String string : s){
-            sb.append(string).append(",");
-        }
-        int ind = sb.lastIndexOf(",");
-        return ind > -1 ? sb.toString().substring(0, ind) : sb.toString();
-    }
-    
-    public static String csvForDb(String[] s){
-        StringBuilder sb = new StringBuilder();
-        for(String string : s){
-            try{
-                Integer.parseInt(string);
-            } catch(NumberFormatException e){
-                string = "'" + string + "'";
-                if(Pattern.compile("^'\\d{4}-\\d{2}-\\d{2}'$").matcher(string).matches()){
-                    string = "DATE " + string;
-                }
-            }
-            sb.append(string).append(",");
-        }
-        return sb.toString().substring(0, sb.lastIndexOf(","));
-    }
-    
+        
     public static <R> Optional<R> swallow(FunctionThatThrowsReturns<R> call) {
         try {
             return Optional.ofNullable(call.apply());
@@ -88,35 +62,28 @@ public class OcsUtil {
 
     @FunctionalInterface
     public static interface FunctionThatThrows {
-
         public void apply() throws Exception;
     }
 
     @FunctionalInterface
     public static interface FunctionThatThrowsReturns<R> {
-
         public R apply() throws Exception;
     }
 
     @FunctionalInterface
     public static interface Closeable<T> extends AutoCloseable {
-
         default public T get() {
             throw new RuntimeException("not implemented");
         }
-
         @Override
         public void close();
     }
 
     public static abstract class CloseableImpl<T> implements Closeable<T> {
-
         final private T t;
-
         public CloseableImpl(T t) {
             this.t = t;
         }
-
         @Override
         public T get() {
             return t;

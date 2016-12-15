@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -14,14 +15,14 @@ import java.util.stream.Collectors;
  */
 final public class StringUtil {
 
-    private static final Logger log = Logger.getLogger(StringUtil.class.getName());
+    private static final Logger LOG = Logger.getLogger(StringUtil.class.getName());
 
-    public static final long IMPLICIT_WAIT_SEC = 5;
-    public static final long PAGE_LOAD_TIMOUT_SEC = 60;
-    public static final long SCRIPT_TIMEOUT_SEC = 30;
-    public static final long THIRTY_SEC_FROM_NOW = 30000;
-    public static final long FIVE_SEC_FROM_NOW = 5000;
-    public static final long THIRTY_DAYS_FROM_NOW = TimeUnit.DAYS.toMillis(30L);
+    public static final long IMPLICIT_WAIT_SEC       = 5;
+    public static final long PAGE_LOAD_TIMOUT_SEC    = 60;
+    public static final long SCRIPT_TIMEOUT_SEC      = 30;
+    public static final long THIRTY_SEC_FROM_NOW     = TimeUnit.SECONDS.toMillis(30);
+    public static final long FIVE_SEC_FROM_NOW       = TimeUnit.SECONDS.toMillis(5);
+    public static final long THIRTY_DAYS_FROM_NOW    = TimeUnit.DAYS.toMillis(30L);
     public static final DateTimeFormatter MDY_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     public static final DateTimeFormatter YMD_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter DMY_FORMAT = DateTimeFormatter.ofPattern("dd-MMM-yy");
@@ -32,9 +33,7 @@ final public class StringUtil {
     static {
         try {
             sha1 = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
-        }
-
+        } catch (NoSuchAlgorithmException e) {}
     }
 
     public static String camelCase(String s) {
@@ -108,7 +107,7 @@ final public class StringUtil {
         if (len > 0) {
             val = Math.abs((int) System.nanoTime() % len) + a;
         }
-        log.info(String.format("randomBetween(%d, %d): %d", a, b, val));
+        LOG.info(String.format("randomBetween(%d, %d): %d", a, b, val));
         return val;
     }
 
@@ -190,8 +189,6 @@ final public class StringUtil {
 
     public static String convertAbbreviationToName(String state) {
         String result = null;
-
-        log.info("convertAbbreviationToName() enter");
 
         if (state.equals("AL")) {
             result = "Alabama";
@@ -298,11 +295,10 @@ final public class StringUtil {
         } else {
             result = state;
         }
-        log.info("convertAbbreviationToName() exit");
         return result;
     }
 
-    public static String CsvArray(Object[] objs) {
+    public static String csvArray(Object[] objs) {
         StringBuilder sb = new StringBuilder();
         for (Object obj : objs) {
             sb.append("'").append(obj).append("', ");
@@ -323,16 +319,8 @@ final public class StringUtil {
     public static String splitEmail(String emailAddress, String uuid) {
         String newEmailAddress = null;
         String at = "@";
-
-        log.info("splitEmail() enter");
-        log.info("uuid = " + uuid + " uuid.length = " + uuid.length());
-
         String[] e = emailAddress.split(at);
         newEmailAddress = e[0] + uuid + at + e[1];
-        log.info("newEmailAddress: " + newEmailAddress);
-
-        log.info("splitEmail() exit");
-
         return newEmailAddress;
     }
 
@@ -350,32 +338,57 @@ final public class StringUtil {
 
     public static String generateDisposableEmailAddress() {
         String email = generateEmailAddress();
-        String uuid = getUUID();// UUID.randomUUID();
+        String uuid = getUuid();// UUID.randomUUID();
         email = StringUtil.splitEmail(email, uuid);
         //addEmailToDispose(email);
         return email;
     }
 
-    private static String getUUID() {
-        return generateUUID().substring(0, 8);
+    private static String getUuid() {
+        return generateUuid().substring(0, 8);
     }
 
-    private static String generateUUID() {
+    private static String generateUuid() {
         return java.util.UUID.randomUUID().toString();
     }
 
-    public static String generateRandomSSN() {
+    public static String generateRandomSsn() {
         return String.format("%09d", new Random().nextInt(100000000));
     }
 
     public static String escapeSql(String sql) {
         return sql.replace(":", "\\:");
     }
+    
+    public static String csv(String[] s){
+        StringBuilder sb = new StringBuilder();
+        for(String string : s){
+            sb.append(string).append(",");
+        }
+        int ind = sb.lastIndexOf(",");
+        return ind > -1 ? sb.toString().substring(0, ind) : sb.toString();
+    }
+    
+    public static String csvForDb(String[] s){
+        StringBuilder sb = new StringBuilder();
+        for(String string : s){
+            try{
+                Integer.parseInt(string);
+            } catch(NumberFormatException e){
+                string = "'" + string + "'";
+                if(Pattern.compile("^'\\d{4}-\\d{2}-\\d{2}'$").matcher(string).matches()){
+                    string = "DATE " + string;
+                }
+            }
+            sb.append(string).append(",");
+        }
+        return sb.toString().substring(0, sb.lastIndexOf(","));
+    }
 
     public static String removeSpecialChars(String string) {
         return string.chars()
-                .filter(c -> Character.isLetter((char) c) || Character.isWhitespace((char) c))
-                .mapToObj(c -> "" + (char) c)
-                .collect(Collectors.joining());
+        .filter(c -> Character.isLetter((char) c) || Character.isWhitespace((char) c))
+        .mapToObj(c -> "" + (char) c)
+        .collect(Collectors.joining());
     }
 }
