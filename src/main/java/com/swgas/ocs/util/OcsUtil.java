@@ -34,6 +34,14 @@ public class OcsUtil {
             ));
         }
     }
+    
+    public static <R> Optional<R> ignore(FunctionThatThrowsReturns<R> call) {
+        try {
+            return Optional.ofNullable(call.apply());
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
 
     public static void runtime(FunctionThatThrows call) {
         try {
