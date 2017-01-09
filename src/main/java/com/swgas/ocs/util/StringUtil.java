@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * Utility class for String parsing, formatting, hash generation, etc.
  *
  */
-final public class StringUtil {
+public class StringUtil {
 
     private static final Logger LOG = Logger.getLogger(StringUtil.class.getName());
 
@@ -35,6 +35,70 @@ final public class StringUtil {
             sha1 = MessageDigest.getInstance("SHA1");
         } catch (NoSuchAlgorithmException e) {}
     }
+    
+    public enum States {
+          ALABAMA        ("AL", "Alabama")
+        , ALASKA         ("AK", "Alaska")        
+        , ARAZONA        ("AZ", "Arizona")
+        , ARKANSAS       ("AR", "Arkansas")
+        , CALIFORNIA     ("CA", "California")
+        , COLORADO       ("CO", "Colorada")
+        , CONNECTICUT    ("CT", "Connecticut")
+        , DELAWARE       ("DE", "Delaware")
+        , DISTRICT_OF_COLUMBIA("DC", "District of Columbia")
+        , FLORIDA        ("FL", "Florida")
+        , GEORGIA        ("GA", "Georgia")
+        , HAWAII         ("HI", "Hawaii")
+        , IDAHO          ("ID", "Idaho")
+        , ILLINOIS       ("IL", "Illinois")
+        , INDIANA        ("IN", "Indiana")
+        , IOWA           ("IA", "Iowa")
+        , KANSAS         ("KS", "Kansas")
+        , KENTUCKY       ("KY", "Kentucky")
+        , LOUISIANA      ("LA", "Louisiana")
+        , MAINE          ("ME", "Maine")
+        , MARYLAND       ("MD", "Maryland")
+        , MASSACHUSETTS  ("MA", "Massachusetts")
+        , MICHIGAN       ("MI", "Michigan")
+        , MINNESOTA      ("MN", "Minnesota")
+        , MISSISSIPPI    ("MS", "Mississippi")
+        , MISSOURI       ("MO", "Missouri")
+        , MONTANA        ("MT", "Montana")
+        , NEBRASKA       ("NE", "Nebraska")
+        , NEVADA         ("NV", "Nevada")
+        , NEW_HAMPSHIRE  ("NH", "New Hampshire")
+        , NEW_JERSEY     ("NJ", "New Jersey")
+        , NEW_MEXICO     ("NM", "New Mexico")
+        , NEW_YORK       ("NY", "New York")
+        , NORTH_CAROLINA ("NC", "North Carolina")
+        , NORTH_DAKOTA   ("ND", "North Dakota")
+        , OHIO           ("OH", "Ohio")
+        , OKLAHOMA       ("OK", "Oklahoma")
+        , OREGON         ("OR", "Oregon")
+        , PENNSYLVANIA   ("PA", "Pennsylvania")
+        , RHODE_ISLAND   ("RI", "Rhode Island")
+        , SOUTH_CAROLINA ("SC", "South Carolina")
+        , SOUTH_DAKOTA   ("SD", "South Dakota")
+        , TENNESSEE      ("TN", "Tennessee")
+        , TEXAS          ("TX", "Texas")
+        , UTAH           ("UT", "Utah")
+        , VERMONT        ("VT", "Vermont")
+        , VIRGINIA       ("VA", "Virginia")
+        , WASHINGTON     ("WA", "Washington")
+        , WEST_VIRGINIA  ("WV", "West Virginia")
+        , WISCONSIN      ("WI", "Wisconsin")
+        , WYOMING        ("WY", "Wyoming");
+  
+        private final String abriviation;
+        private final String name;
+        States(String abrv, String name){
+            abriviation = abrv;
+            this.name = name;
+        }
+        public String getAbriviation(){return abriviation;}
+//        public
+        public String getName(){return name;}
+}
 
     public static String camelCase(String s) {
         if (!s.contains("_")) {
@@ -185,117 +249,6 @@ final public class StringUtil {
             sb.append((int) (Math.random() * 9));
         }
         return sb.toString();
-    }
-
-    public static String convertAbbreviationToName(String state) {
-        String result = null;
-
-        if (state.equals("AL")) {
-            result = "Alabama";
-        } else if (state.equals("AK")) {
-            result = "Alaska";
-        } else if (state.equals("AZ")) {
-            result = "Arizona";
-        } else if (state.equals("AR")) {
-            result = "Arkansas";
-        } else if (state.equals("CA")) {
-            result = "California";
-        } else if (state.equals("CO")) {
-            result = "Colorado";
-        } else if (state.equals("CT")) {
-            result = "Connecticut";
-        } else if (state.equals("DE")) {
-            result = "Delaware";
-        } else if (state.equals("DC")) {
-            result = "District of Columbia";
-        } else if (state.equals("FL")) {
-            result = "Florida";
-        } else if (state.equals("GA")) {
-            result = "Georgia";
-        } else if (state.equals("HI")) {
-            result = "Hawaii";
-        } else if (state.equals("ID")) {
-            result = "Idaho";
-        } else if (state.equals("IL")) {
-            result = "Illinois";
-        } else if (state.equals("IN")) {
-            result = "Indiana";
-        } else if (state.equals("IA")) {
-            result = "Iowa";
-        } else if (state.equals("KS")) {
-            result = "Kansas";
-        } else if (state.equals("KY")) {
-            result = "Kentucky";
-        } else if (state.equals("LA")) {
-            result = "Louisiana";
-        } else if (state.equals("ME")) {
-            result = "Maine";
-        } else if (state.equals("MD")) {
-            result = "Maryland";
-        } else if (state.equals("MA")) {
-            result = "Massachusetts";
-        } else if (state.equals("MI")) {
-            result = "Michigan";
-        } else if (state.equals("MN")) {
-            result = "Minnesota";
-        } else if (state.equals("MS")) {
-            result = "Mississippi";
-        } else if (state.equals("MO")) {
-            result = "Missouri";
-        } else if (state.equals("MT")) {
-            result = "Montana";
-        } else if (state.equals("NE")) {
-            result = "Nebraska";
-        } else if (state.equals("NV")) {
-            result = "Nevada";
-        } else if (state.equals("NH")) {
-            result = "New Hampshire";
-        } else if (state.equals("NJ")) {
-            result = "New Jersey";
-        } else if (state.equals("NM")) {
-            result = "New Mexico";
-        } else if (state.equals("NY")) {
-            result = "New York";
-        } else if (state.equals("NC")) {
-            result = "North Carolina";
-        } else if (state.equals("ND")) {
-            result = "North Dakota";
-        } else if (state.equals("OH")) {
-            result = "Ohio";
-        } else if (state.equals("OK")) {
-            result = "Oklahoma";
-        } else if (state.equals("OR")) {
-            result = "Oregon";
-        } else if (state.equals("PA")) {
-            result = "Pennsylvania";
-        } else if (state.equals("RI")) {
-            result = "Rhode Island";
-        } else if (state.equals("SC")) {
-            result = "South Carolina";
-        } else if (state.equals("SD")) {
-            result = "South Dakota";
-        } else if (state.equals("TN")) {
-            result = "Tennessee";
-        } else if (state.equals("TX")) {
-            result = "Texas";
-        } else if (state.equals("UT")) {
-            result = "Utah";
-        } else if (state.equals("VT")) {
-            result = "Vermont";
-        } else if (state.equals("VA")) {
-            result = "Virginia";
-        } else if (state.equals("WA")) {
-            result = "Washington";
-        } else if (state.equals("WV")) {
-            result = "West Virginia";
-        } else if (state.equals("WI")) {
-            result = "Wisconsin";
-        } else if (state.equals("WY")) {
-            result = "Wyoming";
-        } else {
-            result = state;
-        }
-        return result;
     }
 
     public static String csvArray(Object[] objs) {
