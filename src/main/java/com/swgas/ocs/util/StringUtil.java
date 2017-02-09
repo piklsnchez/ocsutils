@@ -301,7 +301,7 @@ public class StringUtil {
         return generateUuid().substring(0, 8);
     }
 
-    private static String generateUuid() {
+    public static String generateUuid() {
         return java.util.UUID.randomUUID().toString();
     }
 
