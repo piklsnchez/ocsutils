@@ -6,8 +6,28 @@
     <version>1.7</version>
     <packaging>jar</packaging>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+    <!-- dummy needed for suppressing the missing scm url error for build.properties generation -->
+    <scm>
+      <connection>scm:git:file:///tmp</connection>
+    </scm>
+    <repositories>
+      <repository>
+        <id>maven-group</id>
+        <url>http://selenium.swgas.com:8082/repository/maven-group/</url>
+      </repository>
+    </repositories>
+    <distributionManagement>
+      <snapshotRepository>
+        <id>nexus-snapshots</id>
+        <url>http://selenium.swgas.com:8082/repository/maven-snapshots/</url>
+      </snapshotRepository>
+      <repository>
+        <id>nexus-releases</id>
+        <url>http://selenium.swgas.com:8082/repository/maven-releases/</url>
+      </repository>
+    </distributionManagement>
 </project>
