@@ -15,7 +15,7 @@ public class ZipUtils {
     private static final Logger LOG   = Logger.getLogger(CLASS);
     private static final Path TMP     = Paths.get(System.getProperty("java.io.tempdir"));
 
-    public static void unZipToTemp(InputStream in) {
+    public static void unZip(InputStream in, Path outputDirectory) {
         final int len = 8192;
         try(ZipInputStream zipStream = new ZipInputStream(new BufferedInputStream(in))){            
             ZipEntry entry;
@@ -24,7 +24,7 @@ public class ZipUtils {
                 byte[] buff = new byte[len];
                 int count;
                 while((count = zipStream.read(buff)) != -1) {
-                    try(BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(TMP.resolve(entry.getName())), len)){
+                    try(BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(outputDirectory.resolve(entry.getName())), len)){
                         out.write(buff, 0, count);
                     }
                 }
