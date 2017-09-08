@@ -1,7 +1,6 @@
 package com.swgas.ocs.util;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,9 +23,7 @@ public class ZipUtils {
                 byte[] buff = new byte[len];
                 int count;
                 while((count = zipStream.read(buff)) != -1) {
-                    try(BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(outputDirectory.resolve(entry.getName())), len)){
-                        out.write(buff, 0, count);
-                    }
+                    Files.newBufferedWriter(outputDirectory.resolve(entry.getName())).append(new String(buff, 0, count)).close();
                 }
             }
         } catch (Exception e) {
