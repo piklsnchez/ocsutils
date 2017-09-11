@@ -22,7 +22,7 @@ public class ZipUtils {
             LOG.info(Objects.toString(Files.createDirectories(outputDirectory)));
             ZipEntry entry;
             while((entry = zipStream.getNextEntry()) != null) {
-                LOG.finest(String.format("entry: %s (%s; %s)", entry, entry.isDirectory() ? "directory" : "file"));
+                LOG.finest(String.format("entry: %s (%s)", entry, entry.isDirectory() ? "directory" : "file"));
                 byte[] buff = new byte[LEN];
                 int count;
                 while((count = zipStream.read(buff)) != -1) {
