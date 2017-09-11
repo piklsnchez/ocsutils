@@ -1,5 +1,6 @@
 package com.swgas.ocs.util;
 
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,11 +22,11 @@ public class ZipUtils {
             LOG.info(Objects.toString(Files.createDirectories(outputDirectory)));
             ZipEntry entry;
             while((entry = zipStream.getNextEntry()) != null) {
-                LOG.finest(String.format("entry: %s (%s)", entry, entry.isDirectory() ? "directory" : "file"));
+                LOG.finest(String.format("entry: %s (%s; %s)", entry, entry.isDirectory() ? "directory" : "file"));
                 byte[] buff = new byte[LEN];
                 int count;
                 while((count = zipStream.read(buff)) != -1) {
-                    Path name = outputDirectory.resolve(Arrays.stream(entry.getName().split("/")).skip(1).reduce("", (a, b) -> String.format("%s/%s", a, b)));
+                    Path name = outputDirectory.resolve(Arrays.stream(entry.getName().split("/")).skip(1).reduce("", (a, b) -> a.isEmpty() ? b : String.format("%s/%s", a, b)));
                     LOG.info(Objects.toString(name));
                     Files.newBufferedWriter(name).append(new String(buff, 0, count)).close();
                 }
