@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -24,9 +25,9 @@ public class ZipUtils {
                 byte[] buff = new byte[LEN];
                 int count;
                 while((count = zipStream.read(buff)) != -1) {
-                    String name = Arrays.stream(entry.getName().split("/")).skip(1).reduce("", (a, b) -> String.format("%s/%s", a, b));
-                    LOG.info(name);
-                    Files.newBufferedWriter(outputDirectory.resolve(name)).append(new String(buff, 0, count)).close();
+                    Path name = outputDirectory.resolve(Arrays.stream(entry.getName().split("/")).skip(1).reduce("", (a, b) -> String.format("%s/%s", a, b)));
+                    LOG.info(Objects.toString(name));
+                    Files.newBufferedWriter(name).append(new String(buff, 0, count)).close();
                 }
             }
         } catch (Exception e) {
