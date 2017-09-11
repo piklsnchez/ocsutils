@@ -18,10 +18,10 @@ public class ZipUtils {
     public static void unZip(InputStream in, Path outputDirectory) {
         LOG.entering(CLASS, "unZip", Stream.of(in, outputDirectory).toArray());
         try(ZipInputStream zipStream = new ZipInputStream(in)){
-            Files.createDirectories(outputDirectory);
+            LOG.info(Objects.toString(Files.createDirectories(outputDirectory)));
             ZipEntry entry;
             while((entry = zipStream.getNextEntry()) != null) {
-                LOG.finest(String.format("Extracting: %s", entry));
+                LOG.finest(String.format("entry: %s (%s)", entry, entry.isDirectory() ? "directory" : "file"));
                 byte[] buff = new byte[LEN];
                 int count;
                 while((count = zipStream.read(buff)) != -1) {
