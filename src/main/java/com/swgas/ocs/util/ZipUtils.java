@@ -1,12 +1,10 @@
 package com.swgas.ocs.util;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -20,9 +18,9 @@ public class ZipUtils {
     public static void unZip(InputStream in, Path outputDirectory) {
         LOG.entering(CLASS, "unZip", Stream.of(in, outputDirectory).toArray());
         try (ZipInputStream zipStream = new ZipInputStream(in)) {
-            LOG.info(Objects.toString(Files.createDirectories(outputDirectory)));
+            Files.createDirectories(outputDirectory);
             ZipEntry entry;
-            while ((entry = zipStream.getNextEntry()) != null) {
+            while((entry = zipStream.getNextEntry()) != null) {
                 boolean dir = entry.isDirectory();
                 Path path = outputDirectory.resolve(Arrays.stream(entry.getName().split("/")).skip(1).reduce("", (a, b) -> a.isEmpty() ? b : String.format("%s/%s", a, b)));
                 LOG.finest(String.format("path: %s (%s)", path, dir ? "directory" : "file"));
