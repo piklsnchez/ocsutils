@@ -2,6 +2,7 @@ package com.swgas.ocs.util;
 
 import java.security.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -132,10 +133,6 @@ public class StringUtil {
     private static char rndCharNum() {
         return (char)ALPHA_NUMERICS[(int)(Math.random() * ALPHA_NUMERICS.length)];
     }
-    
-    public static void main(String... args){
-      IntStream.range(0, 100).parallel().forEach(__ -> LOG.info(Character.toString(rndCharNum())));
-    }
 
     private static char rndAllChars() {
         return (char)CHARACTERS[(int)(Math.random() * CHARACTERS.length)];
@@ -144,61 +141,38 @@ public class StringUtil {
     /**
      *
      * @param a begin (inclusive)
-     * @param b end (exclusive)
+     * @param b end (inclusive)
      * @return
      */
     public static int randomBetween(int a, int b) {
         if(a > b){
             throw new IllegalArgumentException("b can not be greater than a");
+        } else if(a == b){
+            return a;
         }
-        
-        int len = b - a;
-        int val = Math.max(a, b);
-        //this causes deadlocks!!!!!!
-        /*Random rand = new Random();
-		return rand.nextInt(b) + a;*/
-        if (len > 0) {
-            val = Math.abs((int) System.nanoTime() % len) + a;
-        }
-        LOG.info(String.format("randomBetween(%d, %d): %d", a, b, val));
-        return val;
+        return IntStream.rangeClosed(a, b).skip((int)(Math.random() * (b - a + 1))).findFirst().getAsInt();
     }
 
     public static String randomString(int len) {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < len; i++) {
-            sb.append(rndChar());
-        }
-        return sb.toString();
+        return IntStream.range(0, len).map(__ -> rndChar()).collect(StringBuilder::new, (sb, c) -> sb.append((char)c), StringBuilder::append).toString();
     }
 
     public static String randomStringWithNumbers(int len) {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < len; i++) {
-            sb.append(rndCharNum());
-        }
-        return sb.toString();
+        return IntStream.range(0, len).map(__ -> rndCharNum()).collect(StringBuilder::new, (sb, c) -> sb.append((char)c), StringBuilder::append).toString();
     }
 
     public static String randomStringAllChars(int len) {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < len; i++) {
-            sb.append(rndAllChars());
-        }
-        return sb.toString();
+        return IntStream.range(0, len).map(__ -> rndAllChars()).collect(StringBuilder::new, (sb, c) -> sb.append((char)c), StringBuilder::append).toString();
     }
 
     public static String generateHash(String item) {
-        String uniqid = StringUtil.sha1(UUID.randomUUID().toString());
+        String uniqid = sha1(UUID.randomUUID().toString());
         return generateHash(item, uniqid);
     }
 
     public static String generateHash(String plainText, String salt) {
         salt = salt.substring(0, SALT_LENGTH);
-        return salt + StringUtil.sha1(salt + plainText);
+        return salt + sha1(salt + plainText);
     }
 
     /**
@@ -222,22 +196,17 @@ public class StringUtil {
     private static String toHex(byte[] messageDigest) {
         StringBuilder hexString = new StringBuilder();
         for (int i = 0; i < messageDigest.length; i++) {
-            // NOTE if value in [0,15], toHexString() only returns one char, need to padd with leading zero
-            String hex = Integer.toHexString(0xFF & messageDigest[i]);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
+            hexString.append(String.format("%02x", Byte.toUnsignedInt(messageDigest[i])));
         }
         return hexString.toString();
     }
 
     public static String randomNumberString(int len) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < len; i++) {
-            sb.append((int) (Math.random() * 9));
-        }
-        return sb.toString();
+        return new Random().ints(len, 0, 10).collect(StringBuilder::new, (sb, i) -> sb.append(i), StringBuilder::append).toString();
+    }
+    
+    public static void main(String... args){
+      LOG.info(randomNumberString(14));
     }
 
     public static String csvArray(Object[] objs) {
