@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Utility class for String parsing, formatting, hash generation, etc.
@@ -26,7 +27,10 @@ public class StringUtil {
     public static final DateTimeFormatter MDY_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     public static final DateTimeFormatter YMD_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter DMY_FORMAT = DateTimeFormatter.ofPattern("dd-MMM-yy");
-
+    private static final int[] ALPHAS                = IntStream.concat(IntStream.range('A', 'A' + 26), IntStream.range('a', 'a' + 26)).toArray();    
+    private static final int[] ALPHA_NUMERICS        = IntStream.concat(IntStream.concat(IntStream.range('A', 'A' + 26), IntStream.range('a', 'a' + 26)), IntStream.range('0', '0' + 10)).toArray();
+    private static final int[] CHARACTERS            = IntStream.rangeClosed(33, 126).toArray();
+    
     private static MessageDigest sha1;
     private static final short SALT_LENGTH = 40;
 
@@ -98,37 +102,23 @@ public class StringUtil {
         public String getAbriviation(){return abriviation;}
 //        public
         public String getName(){return name;}
-}
-
-    public static String camelCase(String s) {
-        if (!s.contains("_")) {
-            return s;
-        }
-        boolean hump = true;
-        StringBuilder sb = new StringBuilder();
-        for (char c : s.toCharArray()) {
-            if ('_' == c) {
-                hump = true;
-            } else {
-                sb.append((hump ? Character.toUpperCase(c) : Character.toLowerCase(c)));
-                hump = false;
-            }
-        }
-        return sb.toString();
     }
 
-    public static String unCamelCase(String s) {
-        if (s.contains("_")) {
-            return s;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (char c : s.toCharArray()) {
-            sb.append((Character.isUpperCase(c) || Character.isDigit(c) ? ("_" + c) : c));
-        }
-        if (sb.charAt(0) == '_') {
-            sb.replace(0, 1, "");
-        }
-        return sb.toString().toUpperCase();
+    public static String camelCase(String string) {        
+        String result = Pattern.compile("_").splitAsStream(string)
+        .filter(s -> !s.isEmpty())
+        .map(s -> s.toLowerCase())
+        .map(s -> s.replaceFirst(".", s.substring(0,1).toUpperCase()))
+        .reduce("", String::concat);
+        return result.isEmpty() ? result : result.replaceFirst(".", result.substring(0,1).toLowerCase());
+    }
+
+    public static String unCamelCase(String string) {
+        int cp = "_".codePointAt(0);
+        int[] codePoints = string.codePoints()
+        .flatMap(c -> Character.isUpperCase(c) || Character.isDigit(c) ? IntStream.of(cp, Character.toLowerCase(c)) : IntStream.of(c))
+        .toArray();
+        return new String(codePoints, 0, codePoints.length);
     }
 
     public static String stripSpecialChars(String text) {
@@ -136,24 +126,19 @@ public class StringUtil {
     }
 
     private static char rndChar() {
-        int rnd = (int) (Math.random() * 52);
-        char base = (rnd < 26) ? 'A' : 'a';
-        return (char) (base + rnd % 26);
-
+        return (char)ALPHAS[(int)(Math.random() * ALPHAS.length)];
     }
 
     private static char rndCharNum() {
-        int rnd = (int) (Math.random() * 62);
-        char base = (rnd < 10) ? '0' : ((rnd -= 10) < 26) ? 'A' : 'a';
-        return (char) (base + rnd % 26);
-
+        return (char)ALPHA_NUMERICS[(int)(Math.random() * ALPHA_NUMERICS.length)];
+    }
+    
+    public static void main(String... args){
+      IntStream.range(0, 100).parallel().forEach(__ -> LOG.info(Character.toString(rndCharNum())));
     }
 
     private static char rndAllChars() {
-        int rnd = (int) (Math.random() * 93);
-        char base = 33;
-        return (char) (base + rnd);
-
+        return (char)CHARACTERS[(int)(Math.random() * CHARACTERS.length)];
     }
 
     /**
@@ -163,6 +148,10 @@ public class StringUtil {
      * @return
      */
     public static int randomBetween(int a, int b) {
+        if(a > b){
+            throw new IllegalArgumentException("b can not be greater than a");
+        }
+        
         int len = b - a;
         int val = Math.max(a, b);
         //this causes deadlocks!!!!!!
@@ -231,7 +220,7 @@ public class StringUtil {
      * @return
      */
     private static String toHex(byte[] messageDigest) {
-        StringBuffer hexString = new StringBuffer();
+        StringBuilder hexString = new StringBuilder();
         for (int i = 0; i < messageDigest.length; i++) {
             // NOTE if value in [0,15], toHexString() only returns one char, need to padd with leading zero
             String hex = Integer.toHexString(0xFF & messageDigest[i]);

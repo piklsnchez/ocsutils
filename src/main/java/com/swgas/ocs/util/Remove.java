@@ -1,6 +1,5 @@
 package com.swgas.ocs.util;
 
-import java.io.File;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.io.IOException;
