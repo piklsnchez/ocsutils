@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class OcsUtil {
-    private static final Logger LOG = Logger.getLogger(OcsUtil.class.getName());
+    private static final Logger LOG                   = Logger.getLogger(OcsUtil.class.getName());
     public static final String ALL_ERRORS_ON_PAGE_CSS = "css=.alert-danger";
     public static final String WEBTRANID_ID           = "tranid";
     public static final String ERROR_MESSAGE_ID       = "errorMessage";
@@ -18,7 +18,8 @@ public class OcsUtil {
         } catch (Exception e) {
             LOG.warning(() -> String.format("swallowed: %s%n%s", e, Arrays.stream(e.getStackTrace())
                 .map((ele) -> String.format("%s:%d; ", ele.getFileName(), ele.getLineNumber()))
-                .reduce(String::concat).orElse("?")
+                .reduce(String::concat)
+                .orElse("?")
             ));
             return Optional.empty();
         }
@@ -30,7 +31,8 @@ public class OcsUtil {
         } catch (Throwable e) {
             LOG.warning(() -> String.format("swallowed: %s (Cause: %s)%n%s", e, e.getCause(), Arrays.stream(e.getStackTrace())
                 .map((ele) -> String.format("%s:%d; ", ele.getFileName(), ele.getLineNumber()))
-                .reduce(String::concat).orElse("?")
+                .reduce(String::concat)
+                .orElse("?")
             ));
         }
     }

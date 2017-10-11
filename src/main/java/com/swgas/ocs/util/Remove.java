@@ -50,14 +50,14 @@ public class Remove {
 
     public static boolean removeDirectory(String target) {
         Path destination = Paths.get(Objects.requireNonNull(target));
-        if(!destination.toFile().exists()){
+        if(!Files.exists(destination)){
             return false;
         }
-        if (!destination.toFile().isDirectory()) {
+        if (!Files.isDirectory(destination)) {
             throw new IllegalArgumentException(String.format("must be a directory", target));
         }
         // check if target is a directory
-        EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+        Set<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
         TreeRemover tr = new TreeRemover(destination);
         try {
             Files.walkFileTree(destination, opts, Integer.MAX_VALUE, tr);
