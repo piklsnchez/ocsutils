@@ -3,6 +3,7 @@ package com.swgas.ocs.util;
 import java.security.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +17,6 @@ import java.util.stream.IntStream;
  *
  */
 public class StringUtil {
-
     private static final Logger LOG = Logger.getLogger(StringUtil.class.getName());
 
     public static final long IMPLICIT_WAIT_SEC       = 5;
@@ -31,6 +31,7 @@ public class StringUtil {
     private static final int[] ALPHAS                = IntStream.concat(IntStream.range('A', 'A' + 26), IntStream.range('a', 'a' + 26)).toArray();    
     private static final int[] ALPHA_NUMERICS        = IntStream.concat(IntStream.concat(IntStream.range('A', 'A' + 26), IntStream.range('a', 'a' + 26)), IntStream.range('0', '0' + 10)).toArray();
     private static final int[] CHARACTERS            = IntStream.rangeClosed(33, 126).toArray();
+    private static final String EMAIL_ADDRESS        = "weblogic+ocs@localhost.swgas.com";
     
     private static MessageDigest sha1;
     private static final short SALT_LENGTH = 40;
@@ -202,57 +203,44 @@ public class StringUtil {
     }
 
     public static String randomNumberString(int len) {
-        return new Random().ints(len, 0, 10).collect(StringBuilder::new, (sb, i) -> sb.append(i), StringBuilder::append).toString();
-    }
-    
-    public static void main(String... args){
-      LOG.info(randomNumberString(14));
+        return new Random().ints(len, 0, 10).mapToObj(Objects::toString).reduce("", String::concat);
     }
 
     public static String csvArray(Object[] objs) {
-        StringBuilder sb = new StringBuilder();
-        for (Object obj : objs) {
-            sb.append("'").append(obj).append("', ");
-        }
-        int len = sb.length();
-        sb.delete(len - 2, len);
-        return sb.toString();
+        return Arrays.stream(objs)
+        .map(Objects::toString)
+        .collect(Collectors.joining(","));
     }
 
     /**
-     * finds the position of the @ symbol in the email address, then inserts the
-     * "add"
+     * finds the position of the @ symbol in the email address, then inserts the uuid
      *
      * @param emailAddress
      * @param uuid
      * @return
      */
     public static String splitEmail(String emailAddress, String uuid) {
-        String newEmailAddress = null;
-        String at = "@";
-        String[] e = emailAddress.split(at);
-        newEmailAddress = e[0] + uuid + at + e[1];
-        return newEmailAddress;
+        return emailAddress.replace("@", uuid + "@");
     }
 
+    /**
+     * 
+     * @param s number string; must not be negative
+     * @return number string with leading zeros removed unless s equals zero; if s contains non digit characters returns s
+     */
     public static String trimLeadingZeros(String s) {
-        if (s == null || !s.startsWith("0")) {
+        if (s == null || !s.startsWith("0") || !s.codePoints().allMatch(Character::isDigit)) {
             return s;
         }
-        return "" + Integer.parseInt(s, 10);
+        return Integer.valueOf(s, 10).toString();
     }
 
     public static String generateEmailAddress() {
-        String email = "weblogic+ocs@localhost.swgas.com";
-        return email;
+        return EMAIL_ADDRESS;
     }
 
     public static String generateDisposableEmailAddress() {
-        String email = generateEmailAddress();
-        String uuid = getUuid();// UUID.randomUUID();
-        email = StringUtil.splitEmail(email, uuid);
-        //addEmailToDispose(email);
-        return email;
+        return splitEmail(generateEmailAddress(), getUuid());
     }
 
     private static String getUuid() {
@@ -264,42 +252,27 @@ public class StringUtil {
     }
 
     public static String generateRandomSsn() {
-        return String.format("%09d", new Random().nextInt(100000000));
+        return new Random().ints(9, 0, 10).mapToObj(Objects::toString).reduce("", String::concat);
     }
 
+    /**
+     * this is pretty specific to whatever is using it
+     * @param sql
+     * @return 
+     */
+    @Deprecated
     public static String escapeSql(String sql) {
         return sql.replace(":", "\\:");
     }
     
-    public static String csv(String[] s){
-        StringBuilder sb = new StringBuilder();
-        for(String string : s){
-            sb.append(string).append(",");
-        }
-        int ind = sb.lastIndexOf(",");
-        return ind > -1 ? sb.toString().substring(0, ind) : sb.toString();
-    }
-    
-    public static String csvForDb(String[] s){
-        StringBuilder sb = new StringBuilder();
-        for(String string : s){
-            try{
-                Integer.parseInt(string);
-            } catch(NumberFormatException e){
-                string = "'" + string + "'";
-                if(Pattern.compile("^'\\d{4}-\\d{2}-\\d{2}'$").matcher(string).matches()){
-                    string = "DATE " + string;
-                }
-            }
-            sb.append(string).append(",");
-        }
-        return sb.toString().substring(0, sb.lastIndexOf(","));
+    public static String csvForDb(String[] arr){
+        return csvArray(Arrays.stream(arr).map(s -> s.matches("^'\\d{4}-\\d{2}-\\d{2}'$") ? "DATE " + s : s).toArray());
     }
 
     public static String removeSpecialChars(String string) {
-        return string.chars()
-        .filter(c -> Character.isLetter((char) c) || Character.isWhitespace((char) c))
-        .mapToObj(c -> "" + (char) c)
-        .collect(Collectors.joining());
+        int[] cp = string.codePoints()
+        .filter(c -> Character.isLetter(c) || Character.isWhitespace(c))
+        .toArray();
+        return new String(cp, 0, cp.length);
     }
 }
